@@ -1,0 +1,41 @@
+
+<!-- saved from url=(0058)http://www.jquerystudy.info/tutorial/applied/flow3/01.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<script type="text/javascript" src="./01_files/jquery-1.8.0.min.js"></script>
+		<script type="text/javascript">
+		
+			$(function (){
+				$("#out").mouseover(function(eo){
+					alert("mouseover target : " + eo.target + " / currentTarget : " + eo.currentTarget)
+				});
+			})
+			
+		</script>
+		
+		<style type="text/css">
+		<!--
+			#out {
+				width:200px;
+				height:200px;
+				margin:50px;
+				float:left;
+				background-color:#D6EDFC;
+			}
+			#in {
+				width:50%;
+				height:50%;
+				background-color:#FFCC00;
+				margin:25%;
+			}
+		-->
+		</style>
+	</head>
+	<body>
+		
+		<div id="out">
+			<div id="in"></div>
+		</div>
+
+	
+</body></html>
