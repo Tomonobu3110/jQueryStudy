@@ -6,7 +6,7 @@
                 $("#box").click(function(eo) {
                     $.post(
                         "./ajax_01.cgi",
-                        { sample: 100, hoge: 200, foo: 300 },
+                        { C: 100 },
                         function(data) {
                             alert(data);
                             $('#box').html($(data).find('#hello').text());
