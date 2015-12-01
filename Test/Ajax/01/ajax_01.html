@@ -9,7 +9,7 @@
                         { sample: 100, hoge: 200, foo: 300 },
                         function(data) {
                             alert(data);
-                            $('#box').html(data);
+                            $('#box').html($(data).find('#hoge').text());
                         },
                         "html"
                     );
