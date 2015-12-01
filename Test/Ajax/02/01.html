@@ -1,0 +1,35 @@
+
+<!-- saved from url=(0055)http://www.jquerystudy.info/reference/ajax/post/01.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<script type="text/javascript" src="./01_files/jquery-1.8.0.min.js"></script>
+		<script type="text/javascript">
+			
+			function postFunc(myData, myStatus){
+				$("div").html(myData);
+				$("body").append("myStatus = " + myStatus);
+			};
+		
+			$(function () {
+				$("button").click(function(){
+					$.post("../data/simple.txt", postFunc);
+				});
+			});
+			
+		</script>
+		<style type="text/css">
+		<!--
+			div{
+				width:300px;
+				height:100px;
+				margin:10px;
+				border:solid 1px #666;
+			}
+		-->
+		</style>
+	</head>
+	<body>
+		<button>post</button>
+		<div></div>
+	
+</body></html>
