@@ -23,3 +23,4 @@ if (1 ==  ($c % 2)) {
    print "This is Ajax/Perl-test-1. (".$c.")";
 }
 print "</body></html>\n";
+
