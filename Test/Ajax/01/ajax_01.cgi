@@ -16,6 +16,6 @@ $c = $http->param('C');
 # output response (HTML)
 print "Content-type: text/html; charset=utf-8\n";
 print "\n";
-#print "<html><head></head><body>\n";
+print "<html><body>\n";
 print "<div id='hello'>Hello World. $c</div>\n";
-#print "</body></head></html>\n";
+print "</body></html>\n";
