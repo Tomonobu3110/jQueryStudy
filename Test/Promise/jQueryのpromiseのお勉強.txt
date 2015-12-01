@@ -1,0 +1,255 @@
+jQueryのpromiseのお勉強
+
+promiseオブジェクトは、deferredから生成されます。
+deferredから特定のAPI(resolve/rejectなど)を落とすことで、
+不正な状態操作をできないようにしています。
+
+deferredは、誤解を恐れずに単純化して言えば
+- 内部にステートマシンを持ち、初期状態はpending
+- resolve()されると、resolved状態になり、done()で登録されたコールバックをキック
+- reject()されると、rejected状態になり、fail()で登録されたコールバックをキック
+だけのオブジェクトです。
+
+特筆すべきは then(done_func, fail_func) というメソッドが強力で
+こいつを利用すると、
+時間がかかる処理(非同期処理)の順列が見た目きれいに書けたり、
+try ... catch 的なことができたりするのです。
+
+そもそも promise ってなんで必要なの？どう使うの？はおいておいて、
+下記では、thenを使ったコーディングのお勉強...
+
+「3秒以内にボタンを押せば成功」的な振る舞いの実装。
+
+1. これはサンプルからもらってきたコードほぼそのまま
+
+    $(function () {
+        var myDefer = $.Deferred();　// deferオブジェクト生成
+
+        $("button").click(function(){  // 成功に倒れる条件設定
+            myDefer.resolve();
+        });
+
+        setTimeout(function(){  // 失敗に倒れる条件設定
+            myDefer.reject();
+        },3000);
+
+        var myPromise = myDefer.promise();  // promise取得(お約束)
+        
+        myPromise.then(
+            function(){
+                alert("DONE!");  // 成功なら DONE! を表示
+            },
+            function(){
+                alert("FAIL!");  // 失敗なら FAIL! を表示
+            }
+        );
+    });
+
+2. thenでチェーンしてたくさんつなげてみた
+
+    $(function () {
+        var myDefer = $.Deferred();
+        $("button").click(function(){
+            myDefer.resolve();
+        });
+        setTimeout(function(){
+            myDefer.reject();
+        },3000);
+
+        var myPromise = myDefer.promise();
+
+		// thenはpromiseオブジェクトを返すのでチェーンができる
+		// done/failのfunctionにただの関数を書くと、
+		// 一番最初のpromise(ここだと myPromise)の成功/失敗が引き継がれる
+		
+        myPromise.then(
+            function(){
+                alert("DONE! 1");
+            },
+            function(){
+                alert("FAIL! 1");
+            }
+        ).then(
+            function(){
+                alert("DONE! 2");
+            },
+            function(){
+                alert("FAIL! 2");
+            }
+        ).then(
+            function(){
+                alert("DONE! 3");
+            },
+            function(){
+                alert("FAIL! 3");
+            }
+        ).then(
+            function(){
+                alert("DONE! 4");
+            },
+            function(){
+                alert("FAIL! 4");
+            }
+        );
+
+    });
+
+3. クロージャ (クラスっぽく)
+
+    $(function () {
+
+        // promise factory
+        function createPromise() {
+            var myDefer = $.Deferred();
+            $("button").click(function(){
+                myDefer.resolve();
+            });
+            setTimeout(function(){
+                myDefer.reject();
+            },3000);
+            return myDefer.promise();
+        }
+
+        createPromise().then(
+            function(){
+                alert("DONE! 1");
+            },
+            function(){
+                alert("FAIL! 1");
+            }
+        ).then(
+            function(){
+                alert("DONE! 2");
+            },
+            function(){
+                alert("FAIL! 2");
+            }
+        ).then(
+            function(){
+                alert("DONE! 3");
+            },
+            function(){
+                alert("FAIL! 3");
+            }
+        ).then(
+            function(){
+                alert("DONE! 4");
+            },
+            function(){
+                alert("FAIL! 4");
+            }
+        );
+
+    });
+
+4. done/fail関数の中で、promise生成してみる。
+
+    $(function () {
+
+        // promise factory
+        function createPromise() {
+            var myDefer = $.Deferred();
+            $("button").click(function(){
+                myDefer.resolve();
+            });
+            setTimeout(function(){
+                myDefer.reject();
+            },3000);
+            return myDefer.promise();
+        }
+
+		// done/failのコールバック関数の中で、
+		// promiseを生成してreturnすると、
+		// 次の then (成功/失敗の判断) は、
+		// その生成された promise の結果で決まる。
+		// これで、逐次処理が書ける。
+		
+        createPromise().then(
+            function(){
+                alert("DONE! 1");
+                return createPromise(); // create new promise
+            },
+            function(){
+                alert("FAIL! 1");
+                return createPromise(); // create new promise
+            }
+        ).then(
+            function(){
+                alert("DONE! 2");
+                return createPromise(); // create new promise
+            },
+            function(){
+                alert("FAIL! 2");
+                return createPromise(); // create new promise
+            }
+        ).then(
+            function(){
+                alert("DONE! 3");
+            },
+            function(){
+                alert("FAIL! 3");
+            }
+        );
+
+    });
+
+5. try ... catch 的な
+
+
+    $(function () {
+
+        // promise factory
+        function createPromise(text) {
+            // set text if specified.
+            if (null != text) {
+                $("button").text(text);
+            }
+
+            // create promise.
+            var myDefer = $.Deferred();
+            $("button").click(function(){
+                myDefer.resolve();
+            });
+            setTimeout(function(){
+                myDefer.reject();
+            },3000);
+            return myDefer.promise();
+        }
+
+		// thenのfail側を書かないと、
+		// 何も実行せずに、次の then に移る。
+		// その際には、2. で試したように、
+		// 前の promise の状態を引き継ぐので、
+		// たとえばこの例では、一度 fail に倒れると
+		// ダダダッと処理が進んで、
+		// 最後の then の fail 側が実行されることになる。
+		
+        // combo game.
+        createPromise("click here in 3sec!").then(
+            function() {
+                alert("OK!");
+                return createPromise("once again!!"); // create new promise
+            }
+        ).then(
+            function() {
+                alert("OK - 2 hit combo.");
+                return createPromise("again quick!!"); // create new promise
+            }
+        ).then(
+            function() {
+                alert("Great! - 3 hit combo.");
+                return createPromise("again again! last one!"); // create new promise
+            }
+        ).then(
+            function() {
+                alert("Perfect! - 4 hit combo.");
+            },
+            function() {
+                alert("failed to make combo.");
+            }
+        );
+
+    });
+
+以上です。
+
