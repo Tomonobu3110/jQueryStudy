@@ -1,0 +1,66 @@
+
+<!-- saved from url=(0063)http://www.jquerystudy.info/reference/deferred/deferred/03.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <script type="text/javascript" src="./01_files/jquery-1.8.0.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+
+                // promise factory
+                function createPromise() {
+                    var myDefer = $.Deferred();
+                    $("button").click(function(){
+                        myDefer.resolve();
+                    });
+                    setTimeout(function(){
+                        myDefer.reject();
+                    },3000);
+                    return myDefer.promise();
+                }
+
+                createPromise().then(
+                    function(){
+                        alert("DONE! 1");
+                        return createPromise(); // create new promise
+                    },
+                    function(){
+                        alert("FAIL! 1");
+                        return createPromise(); // create new promise
+                    }
+                ).then(
+                    function(){
+                        alert("DONE! 2");
+                        return createPromise(); // create new promise
+                    },
+                    function(){
+                        alert("FAIL! 2");
+                        return createPromise(); // create new promise
+                    }
+                ).then(
+                    function(){
+                        alert("DONE! 3");
+                    },
+                    function(){
+                        alert("FAIL! 3");
+                    }
+/*
+                ).then(
+                    function(){
+                        alert("DONE! 4");
+                    },
+                    function(){
+                        alert("FAIL! 4");
+                    }
+*/
+                );
+
+            });
+
+        </script>
+    </head>
+
+    <body>
+        <button>click</button><br>
+
+</body></html>
