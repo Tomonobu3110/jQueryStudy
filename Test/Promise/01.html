@@ -1,0 +1,38 @@
+
+<!-- saved from url=(0063)http://www.jquerystudy.info/reference/deferred/deferred/03.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <script type="text/javascript" src="./01_files/jquery-1.8.0.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+                var myDefer = $.Deferred();
+                $("button").click(function(){
+                    myDefer.resolve();
+                });
+                setTimeout(function(){
+                    myDefer.reject();
+                },3000);
+
+
+                var myPromise = myDefer.promise();
+
+                myPromise.then(
+                    function(){
+                        alert("DONE!");
+                    },
+                    function(){
+                        alert("FAIL!");
+                    }
+                );
+
+
+            });
+
+        </script>
+    </head>
+
+    <body>
+        <button>click</button><br>
+
+</body></html>
