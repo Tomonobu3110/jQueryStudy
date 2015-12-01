@@ -1,0 +1,61 @@
+
+<!-- saved from url=(0063)http://www.jquerystudy.info/reference/deferred/deferred/03.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <script type="text/javascript" src="./01_files/jquery-1.8.0.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+
+                // promise factory
+                function createPromise(text) {
+                    // set text if specified.
+                    if (null != text) {
+                        $("button").text(text);
+                    }
+
+                    // create promise.
+                    var myDefer = $.Deferred();
+                    $("button").click(function(){
+                        myDefer.resolve();
+                    });
+                    setTimeout(function(){
+                        myDefer.reject();
+                    },3000);
+                    return myDefer.promise();
+                }
+
+                // combo game.
+                createPromise("click here in 3sec!").then(
+                    function() {
+                        alert("OK!");
+                        return createPromise("once again!!"); // create new promise
+                    }
+                ).then(
+                    function() {
+                        alert("OK - 2 hit combo.");
+                        return createPromise("again quick!!"); // create new promise
+                    }
+                ).then(
+                    function() {
+                        alert("Great! - 3 hit combo.");
+                        return createPromise("again again! last one!"); // create new promise
+                    }
+                ).then(
+                    function() {
+                        alert("Perfect! - 4 hit combo.");
+                    },
+                    function() {
+                        alert("failed to make combo.");
+                    }
+                );
+
+            });
+
+        </script>
+    </head>
+
+    <body>
+        <button>click</button><br>
+
+</body></html>
