@@ -1,0 +1,64 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="./lib/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+                $("#box").click(function(eo) {
+
+                    // 1st calc : 1 + 2
+                    $.ajax({
+                        type: "post",
+                        url: "./ajax_calc_add.cgi",
+                        data: JSON.stringify({ a: 1, b: 2 }),
+                        contentType: "application/json",
+                        dataType: "html"
+                    }).then(function(html_data) {
+                        // 2nd calc : (1 + 2) x 3
+                        var res  = $(html_data).find('#res').text();
+                        var json = eval ( "(" + res + ")" );
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_mul.cgi",
+                            data: JSON.stringify({ a: json.res, b: 3 }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }).then(function(html_data) {
+                        // 3rd calc : ((1 + 2) x 3) + 4
+                        var res  = $(html_data).find('#res').text();
+                        var json = eval ( "(" + res + ")" );
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_add.cgi",
+                            data: JSON.stringify({ a: json.res, b: 4 }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }).then(function(html_data) {
+                        // 3rd calc : ((1 + 2) x 3) + 4
+                        var res  = $(html_data).find('#res').text();
+                        var json = eval ( "(" + res + ")" );
+                        alert(json.res);
+                    });
+                });
+            })
+
+        </script>
+
+        <style type="text/css">
+        <!--
+            #box {
+                width:200px;
+                height:200px;
+                margin:50px;
+                float:left;
+                background-color:#D6EDFC;
+            }
+        -->
+        </style>
+    </head>
+    <body>
+        <div id="box"></div>
+</body></html>
+
+
