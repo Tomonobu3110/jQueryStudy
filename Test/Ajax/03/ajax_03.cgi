@@ -19,14 +19,14 @@ sleep 3;
 
 # construct response
 my $res = {
-	name => "Tomonobu Saito",
+	name => 'Tomonobu Saito',
 	count => $c + 1,
 };
 
 # output response (json wrapped HTML)
 print "Content-type: text/html; charset=utf-8\n";
 print "\n";
-print "<html><body><div id='res'>"
+print "<html><body><div id='res'>";
 print encode_json $res;
 print "</div></body></html>\n";
 
