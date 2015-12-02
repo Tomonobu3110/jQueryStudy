@@ -27,8 +27,10 @@
                     }
 
                     // result parser
-                    function result(html_data) {
-                        var res  = $(html_data).find('#res').text();
+                    function parse(html_data) {
+                        alert(html_data);
+                        var res = $(html_data).find('#res').text();
+                        alert(res);
                         var json = eval ( "(" + res + ")" );
                         return json.res;
                     }
