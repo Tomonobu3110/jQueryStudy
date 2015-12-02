@@ -1,0 +1,75 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="./lib/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+                $("#box").click(function() {
+                    // function for add by ajax
+                    function add(a, b) {
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_add.cgi",
+                            data: JSON.stringify({ 'a': a, 'b': b }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }
+
+                    // function for mul by ajax
+                    function mul(a, b) {
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_mul.cgi",
+                            data: JSON.stringify({ 'a': a, 'b': b }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }
+
+                    // result parser
+                    function result(data) {
+                        var res  = $(html_data).find('#res').text();
+                        var json = eval ( "(" + res + ")" );
+                        return json.res;
+                    }
+
+                    ////////////////////////////////////////
+                    //
+                    // calc : ((1 + 2) x 3) + 4
+                    //
+                    ////////////////////////////////////////
+
+                    add(1, 2).then(function(data) {
+                        var res = result(data);
+                        mul(res, 3);
+                    }).then(function(data) {
+                        var res = result(data);
+                        add(res, 4);
+                    }).then(function(data) {
+                        var res = result(data);
+                        $("#box").text("result is " + res);
+                        alert(res);
+                    });
+
+                });
+            })
+
+        </script>
+
+        <style type="text/css">
+        <!--
+            #box {
+                width:200px;
+                height:200px;
+                margin:50px;
+                float:left;
+                background-color:#D6EDFC;
+            }
+        -->
+        </style>
+    </head>
+    <body>
+        <div id="box"></div>
+</body></html>
+
+
