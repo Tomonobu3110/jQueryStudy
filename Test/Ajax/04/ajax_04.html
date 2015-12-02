@@ -23,7 +23,7 @@
                             // alert(data);
                             var res  = $(html_data).find('#res').text();
                             var json = eval ( "(" + res + ")" );
-                            $('#box').text("count = " + json.count + " name = " + json.name);
+                            $('#box').text("count = " + json.count + "<br />name = " + json.name);
                         },
                         error: function() {
                             alert("Error");
