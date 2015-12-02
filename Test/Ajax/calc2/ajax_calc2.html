@@ -41,10 +41,10 @@
 
                     add(1, 2).then(function(data) {
                         var res = result(data);
-                        mul(res, 3);
+                        return mul(res, 3);
                     }).then(function(data) {
                         var res = result(data);
-                        add(res, 4);
+                        return add(res, 4);
                     }).then(function(data) {
                         var res = result(data);
                         $("#box").text("result is " + res);
