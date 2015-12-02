@@ -1,0 +1,154 @@
+無料レンタルサーバ上でのjQuery/Ajax
+
+jQueryでAjaxの勉強をしようと思いたったのですが、
+今今運用しているのが某無料レンタルサーバでして、
+これには以下のようななかなか素敵な仕様が...
+
+http://www23.tok2.com/home/FAQ/cgi1.html
+1. TOK2では、ＣＧＩによるＨＴＴＰヘッダーの出力は『全て』無視されます。
+2. そしてContent-Typeに無関係に、ある一つの決まったヘッダが出力されます
+3. "<BODY>""</BODY>"と言う文字列の付近に広告のバナーの為の文字列が附加されます。
+
+あ、サーバばれましたね(笑)
+3はしょうがないですが、1と2はなかなか大胆だなぁ。
+無料ですので全く文句が言えないですが。
+
+問題なのは、
+「Content-Type: application/json; でお返事したくてもできない」
+という点。
+
+まあ、まずはHTMLのままでいいかと思い、
+サーバからのレスポンスを 丸っと $("xxx").html にぶっこむ
+超適当なコードを書いたのですが、
+3の広告のつけ方がなかなか大胆なのか、思うように動かず。
+
+仕方がないので、id指定でDOM要素を見つけて、
+そこに含まれる文字列を抽出するようにしました。
+
+■ CGI側
+
+	#!/usr/bin/perl
+
+	# use strict;
+	use warnings;
+	use CGI;
+
+	# Test script for Ajax trial
+	# ajax_01.cgi
+	#   01-Dec, 2015
+	# by Saito Tomonobu (Tomonobu.Saito@gmail.com)
+
+	# get parameter (name is 'C')
+	$http = new CGI;
+	$c = $http->param('C');
+
+	# output response (HTML)
+	print "Content-type: text/html; charset=utf-8\n";
+	print "\n";
+	print "<html><body>\n";
+	print "<div id='hello'>Hello World. $c</div>\n";
+	print "</body></html>\n";
+
+■ JavaScript(jQuery)側
+
+    $(function () {
+        $("#box").click(function(eo) {
+            $.post(
+                "./ajax_01.cgi",
+                { C: 100 },
+                function(data) {
+                    // alert(data);
+                    $('#box').html($(data).find('#hello').text());
+                },
+                "html"
+            );
+        });
+    })
+
+とりあえず期待通りに動作しました。
+
+では次に、ここにjson文字列を突っ込んでみるか、ということで
+一応、往路も復路もjsonでのやり取りに成功しました。
+
+■ CGI側
+
+	#!/usr/bin/perl
+
+	use lib lib; # library path
+
+	# use strict;
+	use warnings;
+	use CGI;
+	use JSON;
+
+	# Test script for Ajax trial
+	# ajax_04.cgi
+	#   02-Dec, 2015
+	# by Saito Tomonobu (Tomonobu.Saito@gmail.com)
+
+	# get parameter (name is 'C')
+	$http = new CGI;
+	$json = $http->param('POSTDATA');
+	$data = decode_json $json;
+	$c    = $data->{"C"};
+
+	# sleep 3 sec (emulation of heavy task.)
+	sleep 3;
+
+	# construct response
+	my $res = {
+		name => 'Tomonobu Saito',
+		count => $c + 1,
+	};
+
+	# output response (json wrapped HTML)
+	print "Content-type: text/html; charset=utf-8\n";
+	print "\n";
+	print "<html><body><div id='res'>";
+	print encode_json $res;
+	print "</div></body></html>\n";
+
+	# eof
+
+■ JavaScript(jQuery)側
+
+    $(function () {
+        $("#box").click(function(eo) {
+
+            // json data for send.
+            var data = {
+                name: "hogehoge",
+                C: 100
+            };
+
+            // ajax call
+            $.ajax({
+                type: "post",
+                url: "./ajax_04.cgi",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                dataType: "html",
+                success: function(html_data) {
+                    // response data is json format wrapped HTML.
+                    // alert(data);
+                    var res  = $(html_data).find('#res').text();
+                    var json = eval ( "(" + res + ")" );
+                    $('#box').html("count = " + json.count + "<br />name = " + json.name);
+                },
+                error: function() {
+                    alert("Error");
+                },
+                complete: function() {
+                    alert("complete");
+                }
+            });
+        });
+    })
+
+
+サンプルコードはこちらからどうぞ...
+
+GitHub : https://github.com/Tomonobu3110/jQueryStudy/tree/master/Test/Ajax
+
+以上です
+
