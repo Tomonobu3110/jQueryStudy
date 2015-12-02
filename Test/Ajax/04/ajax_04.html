@@ -15,7 +15,7 @@
                     $.ajax({
                         type: "post",
                         url: "./ajax_04.cgi",
-                        data: JSON.stringfy(data),
+                        data: JSON.stringify(data),
                         contentType: "application/json",
                         dataType: "html",
                         success: function(html_data) {
