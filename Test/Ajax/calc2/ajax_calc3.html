@@ -1,0 +1,90 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="./lib/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+                $("#box").click(function() {
+                    // function for add by ajax
+                    function add(a, b) {
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_add.cgi",
+                            data: JSON.stringify({ 'a': a, 'b': b }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }
+
+                    // function for mul by ajax
+                    function mul(a, b) {
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_mul.cgi",
+                            data: JSON.stringify({ 'a': a, 'b': b }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }
+
+                    // result parser
+                    function result(html_data) {
+                        var res  = $(html_data).find('#res').text();
+                        var json = eval ( "(" + res + ")" );
+                        return json.res;
+                    }
+
+                    ////////////////////////////////////////
+                    //
+                    // calc : ((1 + 2) x (3 + 4)) + ((5 + 6) x (7 + 8))
+                    //
+                    ////////////////////////////////////////
+
+                    $.when(
+                        add(1, 2),
+                        add(3, 4),
+                        add(5, 6),
+                        add(7, 8)
+                    ).then(function(data1, data2, data3, data4) {
+                        var res1 = result(data1);
+                        var res2 = result(data2);
+                        var res3 = result(data3);
+                        var res4 = result(data4);
+
+                        return $.when(
+                            mul(res1, res2),
+                            mul(res3, res4)
+                        );
+                    }).then(function(data1, data2) {
+                        var res1 = result(data1);
+                        var res2 = result(data2);
+
+                        return add(res1, res2);
+                    }).then(function(data) {
+                        var res = result(data);
+
+                        $("#box").text("result is " + res);
+                        alert(res);
+                    });
+
+                });
+            })
+
+        </script>
+
+        <style type="text/css">
+        <!--
+            #box {
+                width:200px;
+                height:200px;
+                margin:50px;
+                float:left;
+                background-color:#D6EDFC;
+            }
+        -->
+        </style>
+    </head>
+    <body>
+        <div id="box"></div>
+</body></html>
+
+
