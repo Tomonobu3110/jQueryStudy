@@ -45,11 +45,11 @@
                         add(5, 6),
                         add(7, 8)
                     ).then(function(data1, data2, data3, data4) {
-                        alert("hoge");
                         var res1 = result(data1);
                         var res2 = result(data2);
                         var res3 = result(data3);
                         var res4 = result(data4);
+                        alert("hoge " + res1 + ", " + res2 + ", " + res3 + ", " + res4);
 
                         return $.when(
                             mul(res1, res2),
@@ -58,6 +58,7 @@
                     }).then(function(data1, data2) {
                         var res1 = result(data1);
                         var res2 = result(data2);
+                        alert("hoge hoge " + res1 + ", " + res2);
 
                         return add(res1, res2);
                     }).then(function(data) {
