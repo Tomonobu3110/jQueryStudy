@@ -1,0 +1,58 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="./lib/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+                $("#box").click(function(eo) {
+
+                    // json data for send.
+                    var data = {
+                        name: "hogehoge",
+                        C: 100
+                    };
+
+                    // ajax call
+                    $.ajax({
+                        type: "post",
+                        url: "./ajax_05.cgi",
+                        data: JSON.stringify(data),
+                        contentType: "application/json",
+                        dataType: "html"
+                    }).then(
+                        function(html_data) {
+                            // response data is json format wrapped HTML.
+                            // alert(data);
+                            var res  = $(html_data).find('#res').text();
+                            var json = eval ( "(" + res + ")" );
+                            $('#box').html("count = " + json.count + "<br />name = " + json.name);
+                        },
+                        function() {
+                            alert("Error");
+                        }
+                    ).always(
+                        function() {
+                            alert("complete");
+                        }
+                    );
+                });
+            })
+
+        </script>
+
+        <style type="text/css">
+        <!--
+            #box {
+                width:200px;
+                height:200px;
+                margin:50px;
+                float:left;
+                background-color:#D6EDFC;
+            }
+        -->
+        </style>
+    </head>
+    <body>
+        <div id="box"></div>
+</body></html>
+
+
