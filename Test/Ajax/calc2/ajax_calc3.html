@@ -28,6 +28,7 @@
 
                     // result parser
                     function result(html_data) {
+                        console.log($.type(html_data));
                         console.log(html_data);
                         var res = $(html_data).find('#res').text();
                         console.log(res);
