@@ -6,6 +6,7 @@
                 $("#box").click(function(eo) {
 
                     // 1st calc : 1 + 2
+                    $("#box").text("1st calc (1 + 2) is progress...");
                     $.ajax({
                         type: "post",
                         url: "./ajax_calc_add.cgi",
@@ -16,6 +17,7 @@
                         // 2nd calc : (1 + 2) x 3
                         var res  = $(html_data).find('#res').text();
                         var json = eval ( "(" + res + ")" );
+                        $("#box").text("2nd calc (" + json.res + " x 3) is progress...");
                         return $.ajax({
                             type: "post",
                             url: "./ajax_calc_mul.cgi",
@@ -27,6 +29,7 @@
                         // 3rd calc : ((1 + 2) x 3) + 4
                         var res  = $(html_data).find('#res').text();
                         var json = eval ( "(" + res + ")" );
+                        $("#box").text("3rd calc (" + json.res + " + 4) is progress...");
                         return $.ajax({
                             type: "post",
                             url: "./ajax_calc_add.cgi",
@@ -38,6 +41,7 @@
                         // 3rd calc : ((1 + 2) x 3) + 4
                         var res  = $(html_data).find('#res').text();
                         var json = eval ( "(" + res + ")" );
+                        $("#box").text("result is " + json.res);
                         alert(json.res);
                     });
                 });
