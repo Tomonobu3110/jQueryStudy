@@ -8,8 +8,11 @@
                         "./ajax_03.cgi",
                         { C: 100 },
                         function(data) {
-                            alert(data);
-                            $('#box').html($(data).find('#res').text());
+                            // response data is json format wrapped HTML.
+                            // alert(data);
+                            var res  = $(data).find('#res').text();
+                            var json = eval ( "(" + res + ")" );
+                            $('#box').text("count = " + json.count + " name = " + json.name);
                         },
                         "html"
                     );
