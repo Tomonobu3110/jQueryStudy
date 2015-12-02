@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+use lib lib; # library path
+
 # use strict;
 use warnings;
 use CGI;
