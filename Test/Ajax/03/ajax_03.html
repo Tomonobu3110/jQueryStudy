@@ -1,0 +1,37 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="./lib/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+                $("#box").click(function(eo) {
+                    $.post(
+                        "./ajax_01.cgi",
+                        { C: 100 },
+                        function(data) {
+                            // alert(data);
+                            $('#box').html($(data).find('#hello').text());
+                        },
+                        "html"
+                    );
+                });
+            })
+
+        </script>
+
+        <style type="text/css">
+        <!--
+            #box {
+                width:200px;
+                height:200px;
+                margin:50px;
+                float:left;
+                background-color:#D6EDFC;
+            }
+        -->
+        </style>
+    </head>
+    <body>
+        <div id="box"></div>
+</body></html>
+
+
