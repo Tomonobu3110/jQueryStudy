@@ -27,7 +27,7 @@
                     }
 
                     // result parser
-                    function result(data) {
+                    function result(html_data) {
                         var res  = $(html_data).find('#res').text();
                         var json = eval ( "(" + res + ")" );
                         return json.res;
