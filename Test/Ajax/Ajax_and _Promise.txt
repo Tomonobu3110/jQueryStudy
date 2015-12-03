@@ -1,0 +1,327 @@
+AjaxとPromiseの実験
+
+- Ajaxは非同期呼び出し
+- promiseで非同期処理の数珠つなぎができる
+
+というわけで、これを一緒に使ってみない手はないです。
+$.ajax()は promiseオブジェクトを返すので、
+前回のサンプルを promise で書き直しました。
+
+CGI側は同じコードを流用したので、
+ソースコードは JavaScript(jQuery) の側だけ掲載します。
+最後に promise.always() で受けて、
+ajaxの結果が done/fail どちらでも、completeが表示されるようにしておきました。
+
+■JavaScript(jQuery)側
+
+    $(function () {
+        $("#box").click(function(eo) {
+
+            // json data for send.
+            var data = {
+                name: "hogehoge",
+                C: 100
+            };
+
+            // ajax call
+            $.ajax({
+                type: "post",
+                url: "./ajax_05.cgi",
+                data: JSON.stringify(data),
+                contentType: "application/json",
+                dataType: "html"
+            }).then(
+                function(html_data) {
+                    // response data is json format wrapped HTML.
+                    // alert(data);
+                    var res  = $(html_data).find('#res').text();
+                    var json = eval ( "(" + res + ")" );
+                    $('#box').html("count = " + json.count + "<br />name = " + json.name);
+                },
+                function() {
+                    alert("Error");
+                }
+            ).always(
+                function() {
+                    alert("complete");
+                }
+            );
+        });
+    })
+
+さて、いよいよ ajax の数珠つなぎをしてみるわけですが、
+ただつないでも面白くないんで、
+足し算と掛け算をさせてみることにしました。
+
+以下のサンプルでは ((1 + 2) x 3) + 4 を、
+足し算CGI(ajax_calc_add.cgi) と 掛け算CGI(ajax_clac_mul.cgi) を
+呼び出して計算します。
+それぞれのCGIを呼び出す関数と、結果をパースする関数を定義して、
+可読性はなんとか確保できたかな？
+
+■JavaScript(jQuery)側
+
+    $(function () {
+        $("#box").click(function() {
+            // function for add by ajax
+            function add(a, b) {
+                return $.ajax({
+                    type: "post",
+                    url: "./ajax_calc_add.cgi",
+                    data: JSON.stringify({ 'a': a, 'b': b }),
+                    contentType: "application/json",
+                    dataType: "html"
+                });
+            }
+
+            // function for mul by ajax
+            function mul(a, b) {
+                return $.ajax({
+                    type: "post",
+                    url: "./ajax_calc_mul.cgi",
+                    data: JSON.stringify({ 'a': a, 'b': b }),
+                    contentType: "application/json",
+                    dataType: "html"
+                });
+            }
+
+            // result parser
+            function result(html_data) {
+                var res = $(html_data).find('#res').text();
+                console.log(res);
+                var json = eval ( "(" + res + ")" );
+                return json.res;
+            }
+
+            ////////////////////////////////////////
+            //
+            // calc : ((1 + 2) x 3) + 4
+            //
+            ////////////////////////////////////////
+
+            add(1, 2).then(function(data) { // 1 + 2
+                var res = result(data);
+                return mul(res, 3);         // (1 + 2) x 3
+            }).then(function(data) {
+                var res = result(data);
+                return add(res, 4);         // ((1 + 2) x 3) + 4
+            }).then(function(data) {
+                var res = result(data);
+                $("#box").text("result is " + res);
+                alert(res);
+            });
+        });
+    })
+
+■足し算CGI(ajax_calc_add.cgi)
+
+#!/usr/bin/perl
+
+use lib lib; # library path
+
+# use strict;
+use warnings;
+use CGI;
+use JSON;
+
+# Test script for Ajax trial
+# ajax_calc_add.cgi
+#   02-Dec, 2015
+# by Saito Tomonobu (Tomonobu.Saito@gmail.com)
+
+# get parameter (a and b)
+$http = new CGI;
+$json = $http->param('POSTDATA');
+$data = decode_json $json;
+$a    = $data->{"a"};
+$b    = $data->{"b"};
+
+# sleep 3 sec (emulation of heavy task.)
+sleep 3;
+
+# construct response
+my $res = {
+	func => "add",
+	a    => $a,
+	b    => $b,
+	res  => $a + $b,
+};
+
+# output response (json wrapped HTML)
+print "Content-type: text/html; charset=utf-8\n";
+print "\n";
+print "<html><body><div id='res'>";
+print encode_json $res;
+print "</div></body></html>\n";
+
+# eof
+
+■掛け算CGI(ajax_clac_mul.cgi)
+
+#!/usr/bin/perl
+
+use lib lib; # library path
+
+# use strict;
+use warnings;
+use CGI;
+use JSON;
+
+# Test script for Ajax trial
+# ajax_calc_mul.cgi
+#   02-Dec, 2015
+# by Saito Tomonobu (Tomonobu.Saito@gmail.com)
+
+# get parameter (a and b)
+$http = new CGI;
+$json = $http->param('POSTDATA');
+$data = decode_json $json;
+$a    = $data->{"a"};
+$b    = $data->{"b"};
+
+# sleep 3 sec (emulation of heavy task.)
+sleep 3;
+
+# construct response
+my $res = {
+	func => "mul",
+	a    => $a,
+	b    => $b,
+	res  => $a * $b,
+};
+
+# output response (json wrapped HTML)
+print "Content-type: text/html; charset=utf-8\n";
+print "\n";
+print "<html><body><div id='res'>";
+print encode_json $res;
+print "</div></body></html>\n";
+
+# eof
+
+計算結果は 13 ということで、正しく計算されました。
+前のajax呼び出しの結果を、次のajax呼び出しの入力にするという順序関係を
+thenでうまく記述できています。万歳 jQuery、万歳 promise。
+
+次は ((1 + 2) x (3 + 4)) + ((5 + 6) x (7 + 8)) の計算に挑戦。
+ところで、この計算式、頭から順を追っても計算できますが、
+
+1. まず (1 + 2) (3 + 4) (5 + 6) (7 + 8) を計算 (それぞれ結果を a, b, c, d とする)
+2. 次に、a x b と c x d を計算 (それぞれ結果を e, f とする)
+3. 最後に、e + f を計算
+
+という風に3段階に分けることができ、
+手順1と手順2では、それぞれの計算を並行して行うことができます。
+
+よって、スクリプトもそういう風に組んでみます。
+複数の promise を同時に待つには、 $.when() が利用できます。
+
+よって、
+
+■JavaScript(jQuery)側
+
+    $(function () {
+        $("#box").click(function() {
+	/*
+			add(a, b), mul(a, b), result(html_data)は省略
+	*/
+
+            ////////////////////////////////////////
+            //
+            // calc : ((1 + 2) x (3 + 4)) + ((5 + 6) x (7 + 8))ud
+            //
+            ////////////////////////////////////////
+
+            $.when(
+                add(1, 2),
+                add(3, 4),
+                add(5, 6),
+                add(7, 8)
+            ).then(function(data1, data2, data3, data4) {
+                var res1 = result(data1);
+                var res2 = result(data2);
+                var res3 = result(data3);
+                var res4 = result(data4);
+                console.log(res1 + ", " + res2 + ", " + res3 + ", " + res4);
+                return $.when(
+                    mul(res1, res2),
+                    mul(res3, res4)
+                );
+            }).then(function(data1, data2) {
+                var res1 = result(data1);
+                var res2 = result(data2);
+                console.log(res1 + ", " + res2);
+
+                return add(res1, res2);
+            }).then(function(data) {
+                var res = result(data);
+
+                $("#box").text("result is " + res);
+                alert(res);
+            });
+
+        });
+    })
+
+おお、なかなか素敵です。見た目もよろしい(と思う)。
+ところが、実はこのコード動きません。
+結論から言うと、
+$.when(promise1, promise2).then(function(data1, data2) { ... } )
+とすると、
+data1, data2 には array が入ってくるのです。
+なので、こうしなくてはいけません。
+
+■JavaScript(jQuery)側 - 修正版 -
+
+    $(function () {
+        $("#box").click(function() {
+	/*
+			add(a, b), mul(a, b), result(html_data)は省略
+	*/
+
+            ////////////////////////////////////////
+            //
+            // calc : ((1 + 2) x (3 + 4)) + ((5 + 6) x (7 + 8))ud
+            //
+            ////////////////////////////////////////
+
+            $.when(
+                add(1, 2),
+                add(3, 4),
+                add(5, 6),
+                add(7, 8)
+            ).then(function(data1, data2, data3, data4) {
+                var res1 = result(data1[0]);  // 配列の最初の要素を明示的に指定
+                var res2 = result(data2[0]);  // 配列の最初の要素を明示的に指定
+                var res3 = result(data3[0]);  // 配列の最初の要素を明示的に指定
+                var res4 = result(data4[0]);  // 配列の最初の要素を明示的に指定
+                console.log(res1 + ", " + res2 + ", " + res3 + ", " + res4);
+                return $.when(
+                    mul(res1, res2),
+                    mul(res3, res4)
+                );
+            }).then(function(data1, data2) {
+                var res1 = result(data1[0]);  // 配列の最初の要素を明示的に指定
+                var res2 = result(data2[0]);  // 配列の最初の要素を明示的に指定
+                console.log(res1 + ", " + res2);
+
+                return add(res1, res2);
+            }).then(function(data) {
+                var res = result(data);  // $.when()を使わない、ひとつ待ちのときは不要
+
+                $("#box").text("result is " + res);
+                alert(res);
+            });
+
+        });
+    })
+
+無事動作しました。
+ChromeのデベロッパーツールでXHR呼び出しを観察していると、
+分散コンピューティングしているみたいでちょっと楽しいです(笑)。
+
+これで、jQueryでajax使うための「基本のキ」はおさえられたかな。
+
+以上です。
+
+GitHub : https://github.com/Tomonobu3110/jQueryStudy/tree/master/Test/Ajax
