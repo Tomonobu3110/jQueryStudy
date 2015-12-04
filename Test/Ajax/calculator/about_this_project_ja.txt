@@ -1,0 +1,210 @@
+(演習) jQuery + CSS + ajaxで電卓作成
+
+まず、電卓のUIを作るのですが、私、CSSが全くのど素人です。
+色々検索し、やっとこさ作り上げました。
+
+jQuery使ってクラスを動的に足したり引いたりして、
+フォーカスと押下状態を実現してみました。
+素材用意しなくてもいいのが便利ですね。
+世の中はこうなっているのか(笑)
+
+<div class="grid-element">
+    <p class="canfocus">1</p>
+</div>
+
+.grid-element {
+    width:  80px;
+    height: 40px;
+    float: left;
+    
+    margin:  2px 2px;
+    padding: 3px 3px;
+    
+    border-top:    5px solid #ddd;
+    border-left:   5px solid #ddd;
+    border-right:  5px solid #bbb;
+    border-bottom: 5px solid #bbb;
+    
+    background-color: #eee;
+    text-align:     center;
+}
+
+.focused {
+	font-weight: bold;
+	font-size: x-large;
+}
+
+.pressed {
+	border-top:    5px solid #bbb;
+    border-left:   5px solid #bbb;
+    border-right:  5px solid #ddd;
+    border-bottom: 5px solid #ddd;
+}
+
+// - mouse down
+$("p").mousedown(function() {
+	console.log("mouse down " + $(this).text());
+	if ($(this).parent().hasClass("grid-element")) {
+		$(this).parent().addClass("pressed");
+	}
+});
+
+// - mouse up
+$("p").mouseup(function() {
+	console.log("mouse up " + $(this).text());
+	$(this).parent().removeClass("pressed");
+});
+
+// - mouse enter
+$("p").mouseenter(function() {
+	if ($(this).hasClass("canfocus")) {
+		$(this).addClass("focused");
+	}
+});
+
+// - mouse leave
+$("p").mouseleave(function() {
+	if ($(this).hasClass("canfocus")) {
+    	$(this).removeClass("focused");
+		$(this).parent().removeClass("pressed");
+    }
+});
+
+クライアント、サーバの分業は以下のようにしました。
+- クライアント側 ： キー入力イベントの送出と、計算式の保持、結果出力
+- サーバ側 ： 式の演算
+
+キーを押すごとにajax呼び出すという...(苦笑)
+勉強なんで許してください。
+
+<div class="grid-element3">
+    <p id="fomula"></p>
+</div>
+
+<div class="grid-element3">
+    <p id="result">(result)</p>
+</div>
+
+////////////////////////
+//
+// ajax : send fomula & get result.
+//
+////////////////////////
+function sendKeyEvent(fomula, lastkey) {
+	console.log("fomula : " + fomula + " / last key : " + lastkey);
+	return $.ajax({
+		type: "post",
+		url:  "./ajax_calc_engine.cgi",
+		data: JSON.stringify({ 'fomula': fomula, 'lastkey': lastkey }),
+		contentType: "application/json",
+		dataType:    "html"
+	});
+}
+
+////////////////////////
+//
+// update
+//
+////////////////////////
+function update(json_data) {
+	if (json_data.result != "n/a") {
+		$("#fomula").text("");
+		$("#result").text(json_data.result);
+	}
+	else {
+		$("#fomula").text(json_data.fomula);
+	}
+}
+
+////////////////////////
+//
+// event handler
+//
+////////////////////////
+$("p").click(function() {
+	console.log("click " + $(this).text());
+	
+	var key    = $(this).text();
+	var fomula = $("#fomula").text();
+
+	sendKeyEvent(fomula,  key).then(
+		function(html_data) {
+			console.log($.type(html_data));
+			// console.log(html_data);
+			var res = $(html_data).find('#res').text();
+			console.log(res);
+			var json = eval ( "(" + res + ")" );
+			
+			update(json);
+		},
+		function() {
+			alert("ERROR: ajax failed.");
+		}
+	);
+});
+
+#!/usr/bin/perl
+
+use lib lib; # library path
+
+# use strict;
+use warnings;
+use CGI;
+use JSON;
+
+# Test script for Ajax trial
+# ajax_calc_engine.cgi
+#   04-Dec, 2015
+# by Saito Tomonobu (Tomonobu.Saito@gmail.com)
+
+# get parameter (a and b)
+$http    = new CGI;
+$json    = $http->param('POSTDATA');
+$data    = decode_json $json;
+$fomula  = $data->{"fomula"};
+$lastkey = $data->{"lastkey"};
+
+$result  = "n/a";
+if ($lastkey eq "=") {
+	$result = eval($fomula);
+	if ($@) {
+		$result = "ERROR: $@";
+	}
+} else {
+	if ($lastkey =~ /[0-9]/) {
+		$fomula = $fomula . $lastkey;
+	} else {
+		$fomula = $fomula . " " . $lastkey . " ";
+	}
+}
+
+# construct response
+my $res = {
+	lastkey => $lastkey,
+	fomula  => $fomula,
+	result  => $result,
+};
+
+# output response (json wrapped HTML)
+print "Content-type: text/html; charset=utf-8\n";
+print "\n";
+print "<html><body><div id='res'>";
+print encode_json $res;
+print "</div></body></html>\n";
+
+# eof
+
+計算式は、evalで演算実行。あぶなすぎるw。
+どこにデプロイしたかは決して言えませんwww。
+
+JavaScript側でもjsonの解釈をevalでやっていて手抜きなんですが、
+これまた勉強という事で許してください。
+
+これで非常に単純ながら、
+jQuery + CSS + ajax を利用したアプリケーションが完成です。
+
+入門レベルの教材には耐えますかね？
+え、今日日、入門だってもっとレベル高いぞ、って？
+ごもっともで微塵も反論できません。
+
+以上です。
