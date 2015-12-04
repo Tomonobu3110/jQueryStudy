@@ -27,7 +27,7 @@ if ($lastkey eq "=") {
 	}
 	$fomula = "";
 } else {
-	$foluma = $fomula . " " . $lastkey;
+	$fomula = $fomula . " " . $lastkey;
 }
 
 # construct response
