@@ -21,7 +21,7 @@ $lastkey = $data->{"lastkey"};
 
 $result  = "";
 if ($lastkey eq "=") {
-	$result = eval { $fomula };
+	$result = eval { $fomula ; };
 	if ($@) {
 		$result = "ERROR: $@";
 	}
