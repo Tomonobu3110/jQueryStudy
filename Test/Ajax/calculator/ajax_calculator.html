@@ -55,6 +55,7 @@
                 //
                 ////////////////////////
                 function sendKeyEvent(fomula, lastkey) {
+                    console.log("fomula : " + fomula + " / last key : " + lastkey);
                     return $.ajax({
                         type: "post",
                         url:  "./ajax_calc_engine.cgi",
@@ -90,7 +91,7 @@
                     var key    = $(this).text();
                     var fomula = $("#fomula").text();
 
-                    sendKey(fomula,  key).then(
+                    sendKeyEvent(fomula,  key).then(
                         function(html_data) {
                             console.log($.type(html_data));
                             var res = $(html_data).find('#res').text();
