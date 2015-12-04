@@ -3,23 +3,14 @@
         <script type="text/javascript">
 
             $(function () {
-                $("p").mouseenter(function() {
-                    if ($(this).hasClass("canfocus")) {
-                        $(this).addClass("focused");
-                    }
-                });
-                $("p").mouseleave(function() {
-                    if ($(this).hasClass("canfocus")) {
-                        $(this).removeClass("focused");
-                        $(this).parent().removeClass("pressed");
-                        $(this).parent().removeClass("pressed-red");
-                        $(this).parent().removeClass("pressed-green");
-                    }
-                });
 
-                $("p").click(function() {
-                    console.log("click " + $(this).text());
-                });
+                ////////////////////////
+                //
+                // Visual Effect(s)
+                //
+                ////////////////////////
+
+                // - mouse down
                 $("p").mousedown(function() {
                     console.log("mouse down " + $(this).text());
                     if ($(this).parent().hasClass("grid-element")) {
@@ -32,11 +23,86 @@
                         $(this).parent().addClass("pressed-green");
                     }
                 });
+
+                // - mouse up
                 $("p").mouseup(function() {
                     console.log("mouse up " + $(this).text());
                     $(this).parent().removeClass("pressed");
                     $(this).parent().removeClass("pressed-red");
                     $(this).parent().removeClass("pressed-green");
+                });
+
+                // - mouse enter
+                $("p").mouseenter(function() {
+                    if ($(this).hasClass("canfocus")) {
+                        $(this).addClass("focused");
+                    }
+                });
+
+                // - mouse leave
+                $("p").mouseleave(function() {
+                    if ($(this).hasClass("canfocus")) {
+                        $(this).removeClass("focused");
+                        $(this).parent().removeClass("pressed");
+                        $(this).parent().removeClass("pressed-red");
+                        $(this).parent().removeClass("pressed-green");
+                    }
+                });
+
+                ////////////////////////
+                //
+                // ajax : send fomula & get result.
+                //
+                ////////////////////////
+                function sendKeyEvent(fomula, lastkey) {
+                    return $.ajax({
+                        type: "post",
+                        url:  "./ajax_calc_engine.cgi",
+                        data: JSON.stringify({ 'fomula': fomula, 'lastkey' : lastkey }),
+                        contentType: "application/json",
+                        dataType:    "html"
+                    });
+                }
+
+                ////////////////////////
+                //
+                // update
+                //
+                ////////////////////////
+                function update(json_data) {
+                    if (json_data.result != "") {
+                        $("#fomula").text("");
+                        $("#result").text(json_data.result);
+                    }
+                    else {
+                        $("#fomula").text(json_data.fomula);
+                    }
+                }
+
+                ////////////////////////
+                //
+                // event handler
+                //
+                ////////////////////////
+                $("p").click(function() {
+                    console.log("click " + $(this).text());
+
+                    var key    = $(this).text();
+                    var fomula = $("#fomula").text();
+
+                    sendKey(fomula,  key).then(
+                        function(html_data) {
+                            console.log($.type(html_data));
+                            var res = $(html_data).find('#res').text();
+                            console.log(res);
+                            var jason = eval ( "(" + res + ")" );
+
+                            update(json);
+                        },
+                        function() {
+                            alert("ERROR: ajax failed.");
+                        }
+                    );
                 });
 
             })
@@ -186,11 +252,11 @@
         <div id="grid">
 
             <div class="grid-element3">
-                <p>Label</p>
+                <p id="fomula"></p>
             </div>
 
             <div class="grid-element3">
-                <p>Label</p>
+                <p id="result">(result)</p>
             </div>
 
             <div class="grid-element">
