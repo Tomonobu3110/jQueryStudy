@@ -16,7 +16,7 @@ use JSON;
 $http    = new CGI;
 $json    = $http->param('POSTDATA');
 $data    = decode_json $json;
-$fomula  = trim($data->{"fomula"});
+$fomula  = $data->{"fomula"};
 $lastkey = $data->{"lastkey"};
 
 $result  = "";
