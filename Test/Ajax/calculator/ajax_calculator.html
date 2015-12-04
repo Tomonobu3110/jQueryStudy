@@ -1,0 +1,245 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="./lib/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript">
+
+            $(function () {
+                $("#box").click(function() {
+                    // function for add by ajax
+                    function add(a, b) {
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_add.cgi",
+                            data: JSON.stringify({ 'a': a, 'b': b }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }
+
+                    // function for mul by ajax
+                    function mul(a, b) {
+                        return $.ajax({
+                            type: "post",
+                            url: "./ajax_calc_mul.cgi",
+                            data: JSON.stringify({ 'a': a, 'b': b }),
+                            contentType: "application/json",
+                            dataType: "html"
+                        });
+                    }
+
+                    // result parser
+                    function result(html_data) {
+                        //console.log($.type(html_data));
+                        //console.log(html_data);
+                        var res = $(html_data).find('#res').text();
+                        console.log(res);
+                        var json = eval ( "(" + res + ")" );
+                        return json.res;
+                    }
+
+                    ////////////////////////////////////////
+                    //
+                    // calc : ((1 + 2) x 3) + 4
+                    //
+                    ////////////////////////////////////////
+
+                    add(1, 2).then(function(data) {
+                        var res = result(data);
+                        return mul(res, 3);
+                    }).then(function(data) {
+                        var res = result(data);
+                        return add(res, 4);
+                    }).then(function(data) {
+                        var res = result(data);
+                        $("#box").text("result is " + res);
+                        alert(res);
+                    });
+
+                });
+            })
+
+        </script>
+
+        <style type="text/css">
+        <!--
+            .clear {
+                clear:both;
+            }
+
+            #grid {
+                width: 300px;
+            }
+
+            .grid-element {
+                width:  80px;
+                height: 40px;
+                float: left;
+
+                margin:  2px 2px;
+                padding: 3px 3px;
+
+                border-top:    5px solid #ddd;
+                border-left:   5px solid #ddd;
+                border-right:  5px solid #bbb;
+                border-bottom: 5px solid #bbb;
+
+                background-color: #eee;
+
+                text-align:     center;
+            }
+
+            .grid-element-red {
+                width:  80px;
+                height: 40px;
+                float: left;
+
+                margin:  2px 2px;
+                padding: 3px 3px;
+
+                border-top:    5px solid #d00;
+                border-left:   5px solid #d00;
+                border-right:  5px solid #b00;
+                border-bottom: 5px solid #b00;
+
+                background-color: #e00;
+
+                text-align: center;
+                color: white;
+            }
+
+            .grid-element-green {
+                width:  80px;
+                height: 40px;
+                float: left;
+
+                margin:  2px 2px;
+                padding: 3px 3px;
+
+                border-top:    5px solid #0d0;
+                border-left:   5px solid #0d0;
+                border-right:  5px solid #0b0;
+                border-bottom: 5px solid #0b0;
+
+                background-color: #0e0;
+
+                text-align:     center;
+            }
+
+            .grid-element2 {
+                width:  180px;
+                height:  40px;
+                float: left;
+
+                margin:  2px 2px;
+                padding: 3px 3px;
+
+                border-top:    5px solid #ddd;
+                border-left:   5px solid #ddd;
+                border-right:  5px solid #bbb;
+                border-bottom: 5px solid #bbb;
+
+                background-color: #eee;
+
+                text-align:     center;
+            }
+
+            .grid-element3 {
+                width:  280px;
+                height:  40px;
+                float: left;
+
+                margin:  2px 2px;
+                padding: 3px 3px;
+
+                border-top:    5px solid #bbb;
+                border-left:   5px solid #bbb;
+                border-right:  5px solid #ddd;
+                border-bottom: 5px solid #ddd;
+
+                background-color: #666;
+
+                text-align: right;
+                color: white;
+            }
+
+            p {
+                padding: 0px 0px;
+                border:  0px 0px;
+                margin:  0px 0px;
+
+                line-height: 40px;
+            }
+            -->
+        </style>
+    </head>
+    <body>
+
+        <div id="grid">
+
+            <div class="grid-element3">
+                <p>Label</p>
+            </div>
+
+            <div class="grid-element3">
+                <p>Label</p>
+            </div>
+
+            <div class="grid-element">
+                <p>7</p>
+            </div>
+            <div class="grid-element">
+                <p>8</p>
+            </div>
+            <div class="grid-element">
+                <p>9</p>
+            </div>
+
+
+            <div class="grid-element">
+                <p>4</p>
+            </div>
+            <div class="grid-element">
+                <p>5</p>
+            </div>
+            <div class="grid-element">
+                <p>6</p>
+            </div>
+
+
+            <div class="grid-element">
+                <p>1</p>
+            </div>
+            <div class="grid-element">
+                <p>2</p>
+            </div>
+            <div class="grid-element">
+                <p>3</p>
+            </div>
+
+            <div class="grid-element">
+                <p>0</p>
+            </div>
+            <div class="grid-element-green">
+                <p>+</p>
+            </div>
+            <div class="grid-element-green">
+                <p>*</p>
+            </div>
+
+            <div class="grid-element-green">
+                <p>/</p>
+            </div>
+            <div class="grid-element-green">
+                <p>-</p>
+            </div>
+            <div class="grid-element-red">
+                <p>=</p>
+            </div>
+
+        </div>
+
+        <div class="clear"></div>
+
+    </body>
+</html>
+
+
