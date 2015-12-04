@@ -97,7 +97,7 @@
                             // console.log(html_data);
                             var res = $(html_data).find('#res').text();
                             console.log(res);
-                            var jason = eval ( "(" + res + ")" );
+                            var json = eval ( "(" + res + ")" );
 
                             update(json);
                         },
