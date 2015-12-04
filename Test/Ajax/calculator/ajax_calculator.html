@@ -4,10 +4,14 @@
 
             $(function () {
                 $("p").mouseenter(function() {
-                    $(this).addClass("focused");
+                    if ($(this).hasClass("canfocus")) {
+                        $(this).addClass("focused");
+                    }
                 });
                 $("p").mouseleave(function() {
-                    $(this).removeClass("focused");
+                    if ($(this).hasClass("canfocus")) {
+                        $(this).removeClass("focused");
+                    }
                 });
             })
 
@@ -142,55 +146,55 @@
             </div>
 
             <div class="grid-element">
-                <p>7</p>
+                <p class="canfocus">7</p>
             </div>
             <div class="grid-element">
-                <p>8</p>
+                <p class="canfocus">8</p>
             </div>
             <div class="grid-element">
-                <p>9</p>
-            </div>
-
-
-            <div class="grid-element">
-                <p>4</p>
-            </div>
-            <div class="grid-element">
-                <p>5</p>
-            </div>
-            <div class="grid-element">
-                <p>6</p>
+                <p class="canfocus">9</p>
             </div>
 
 
             <div class="grid-element">
-                <p>1</p>
+                <p class="canfocus">4</p>
             </div>
             <div class="grid-element">
-                <p>2</p>
+                <p class="canfocus">5</p>
             </div>
             <div class="grid-element">
-                <p>3</p>
+                <p class="canfocus">6</p>
+            </div>
+
+
+            <div class="grid-element">
+                <p class="canfocus">1</p>
+            </div>
+            <div class="grid-element">
+                <p class="canfocus">2</p>
+            </div>
+            <div class="grid-element">
+                <p class="canfocus">3</p>
             </div>
 
             <div class="grid-element">
-                <p>0</p>
+                <p class="canfocus">0</p>
             </div>
             <div class="grid-element-green">
-                <p>+</p>
+                <p class="canfocus">+</p>
             </div>
             <div class="grid-element-green">
-                <p>*</p>
+                <p class="canfocus">*</p>
             </div>
 
             <div class="grid-element-green">
-                <p>/</p>
+                <p class="canfocus">/</p>
             </div>
             <div class="grid-element-green">
-                <p>-</p>
+                <p class="canfocus">-</p>
             </div>
             <div class="grid-element-red">
-                <p>=</p>
+                <p class="canfocus">=</p>
             </div>
 
         </div>
