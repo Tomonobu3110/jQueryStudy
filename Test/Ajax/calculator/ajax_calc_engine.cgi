@@ -19,7 +19,7 @@ $data    = decode_json $json;
 $fomula  = $data->{"fomula"};
 $lastkey = $data->{"lastkey"};
 
-$result  = "";
+$result  = "n/a";
 if ($lastkey eq "=") {
 	$result = eval($fomula);
 	if ($@) {
