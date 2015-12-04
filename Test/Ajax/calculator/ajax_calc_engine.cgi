@@ -21,11 +21,10 @@ $lastkey = $data->{"lastkey"};
 
 $result  = "";
 if ($lastkey eq "=") {
-	$result = eval { $fomula + 0; };
+	$result = eval { $fomula + 0 ; };
 	if ($@) {
 		$result = "ERROR: $@";
 	}
-	$fomula = "";
 } else {
 	$fomula = $fomula . " " . $lastkey;
 }
