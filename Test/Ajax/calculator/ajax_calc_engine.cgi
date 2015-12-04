@@ -26,7 +26,11 @@ if ($lastkey eq "=") {
 		$result = "ERROR: $@";
 	}
 } else {
-	$fomula = $fomula . " " . $lastkey;
+	if ($lastkey =~ /[0-9]/) {
+		$fomula = $fomula . $lastkey;
+	} else {
+		$fomula = $fomula . " " . $lastkey . " ";
+	}
 }
 
 # construct response
