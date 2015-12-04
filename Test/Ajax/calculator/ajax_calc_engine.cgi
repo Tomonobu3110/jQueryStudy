@@ -26,6 +26,7 @@ if ($lastkey eq "=") {
 		if ($@) {
 			$result = "ERROR: $@";
 		}
+	}
 	else {
 		$result = "ERROR: illegal fomula. ($fomula)";
 	}
