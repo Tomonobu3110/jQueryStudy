@@ -32,8 +32,9 @@ if ($lastkey eq "=") {
 
 # construct response
 my $res = {
-	fomula => $fomula,
-	result => $result,
+	lastkey => $lastkey,
+	fomula  => $fomula,
+	result  => $result,
 };
 
 # output response (json wrapped HTML)
