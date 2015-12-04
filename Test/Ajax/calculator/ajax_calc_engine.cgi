@@ -21,7 +21,7 @@ $lastkey = $data->{"lastkey"};
 
 $result  = "n/a";
 if ($lastkey eq "=") {
-	if ($fomula =~ /^\s*(-\s*)?[0-9]+(\s*[\+\-\*\/]\s*(-\s*)?[0-9]+)*\s*$/) {
+	if ($fomula =~ /^\s*(-\s*)?[0-9]+(\.[0-9]+)?(\s*[\+\-\*\/]\s*(-\s*)?[0-9]+(\.[0-9]+)?)*\s*$/) {
 		$result = eval($fomula);
 		if ($@) {
 			$result = "ERROR: $@";
