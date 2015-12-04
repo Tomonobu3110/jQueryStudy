@@ -12,6 +12,8 @@
                     if ($(this).hasClass("canfocus")) {
                         $(this).removeClass("focused");
                         $(this).parent().removeClass("pressed");
+                        $(this).parent().removeClass("pressed-red");
+                        $(this).parent().removeClass("pressed-green");
                     }
                 });
 
@@ -20,11 +22,21 @@
                 });
                 $("p").mousedown(function() {
                     console.log("mouse down " + $(this).text());
-                    $(this).parent().addClass("pressed");
+                    if ($(this).parent().hasClass("grid-element")) {
+                        $(this).parent().addClass("pressed");
+                    }
+                    if ($(this).parent().hasClass("grid-element-red")) {
+                        $(this).parent().addClass("pressed-red");
+                    }
+                    if ($(this).parent().hasClass("grid-element-green")) {
+                        $(this).parent().addClass("pressed-green");
+                    }
                 });
                 $("p").mouseup(function() {
                     console.log("mouse up " + $(this).text());
                     $(this).parent().removeClass("pressed");
+                    $(this).parent().removeClass("pressed-red");
+                    $(this).parent().removeClass("pressed-green");
                 });
 
             })
@@ -150,6 +162,20 @@
                 border-left:   5px solid #bbb;
                 border-right:  5px solid #ddd;
                 border-bottom: 5px solid #ddd;
+            }
+
+            .pressed-red {
+                border-top:    5px solid #b00;
+                border-left:   5px solid #b00;
+                border-right:  5px solid #d00;
+                border-bottom: 5px solid #d00;
+            }
+
+            .pressed-green {
+                border-top:    5px solid #0b0;
+                border-left:   5px solid #0b0;
+                border-right:  5px solid #0d0;
+                border-bottom: 5px solid #0d0;
             }
 
             -->
