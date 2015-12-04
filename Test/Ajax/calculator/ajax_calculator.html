@@ -3,57 +3,11 @@
         <script type="text/javascript">
 
             $(function () {
-                $("#box").click(function() {
-                    // function for add by ajax
-                    function add(a, b) {
-                        return $.ajax({
-                            type: "post",
-                            url: "./ajax_calc_add.cgi",
-                            data: JSON.stringify({ 'a': a, 'b': b }),
-                            contentType: "application/json",
-                            dataType: "html"
-                        });
-                    }
-
-                    // function for mul by ajax
-                    function mul(a, b) {
-                        return $.ajax({
-                            type: "post",
-                            url: "./ajax_calc_mul.cgi",
-                            data: JSON.stringify({ 'a': a, 'b': b }),
-                            contentType: "application/json",
-                            dataType: "html"
-                        });
-                    }
-
-                    // result parser
-                    function result(html_data) {
-                        //console.log($.type(html_data));
-                        //console.log(html_data);
-                        var res = $(html_data).find('#res').text();
-                        console.log(res);
-                        var json = eval ( "(" + res + ")" );
-                        return json.res;
-                    }
-
-                    ////////////////////////////////////////
-                    //
-                    // calc : ((1 + 2) x 3) + 4
-                    //
-                    ////////////////////////////////////////
-
-                    add(1, 2).then(function(data) {
-                        var res = result(data);
-                        return mul(res, 3);
-                    }).then(function(data) {
-                        var res = result(data);
-                        return add(res, 4);
-                    }).then(function(data) {
-                        var res = result(data);
-                        $("#box").text("result is " + res);
-                        alert(res);
-                    });
-
+                $("p").mouseenter(function() {
+                    $(this).addClass("focused");
+                });
+                $("p").mouseleave(function() {
+                    $(this).removeClass("focused");
                 });
             })
 
@@ -138,8 +92,7 @@
                 border-bottom: 5px solid #bbb;
 
                 background-color: #eee;
-
-                text-align:     center;
+                text-align: center;
             }
 
             .grid-element3 {
@@ -167,6 +120,11 @@
                 margin:  0px 0px;
 
                 line-height: 40px;
+            }
+
+            .focused {
+                font-weight: bold;
+                font-size: x-large;
             }
             -->
         </style>
